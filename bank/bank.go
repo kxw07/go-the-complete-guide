@@ -1,14 +1,16 @@
 package main
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 func main() {
-	var balance float64 = 1000
-	var continued bool = true
+	var accountBalance float64 = 1000
 
 	printWelcomeMessage()
 
-	for continued {
+	for {
 		printChoices()
 
 		var choice int
@@ -16,40 +18,62 @@ func main() {
 		fmt.Scan(&choice)
 
 		if choice == 1 {
-			fmt.Println("Your balance is: ", balance)
+			fmt.Printf("Your balance is: %v\n", accountBalance)
 		} else if choice == 2 {
-			amount := deposit()
-			balance += amount
-			fmt.Println("Your new balance is: ", balance)
+			amount, err := deposit()
+
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+
+			accountBalance += amount
+			fmt.Printf("Your new balance is: %v\n", accountBalance)
 		} else if choice == 3 {
-			amount := withdraw()
-			balance -= amount
-			fmt.Println("Your new balance is: ", balance)
+			amount, err := withdraw(accountBalance)
+
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+
+			accountBalance -= amount
+			fmt.Printf("Your new balance is: %v\n", accountBalance)
 		} else if choice == 4 {
-			continued = false
 			fmt.Println("Bye bye!")
+			break
 		} else {
-			fmt.Println("Invalid choice")
+			fmt.Print("Invalid choice\n\n")
 		}
 	}
 }
 
-func withdraw() float64 {
-	fmt.Println("3. withdraw")
+func withdraw(accountBalance float64) (float64, error) {
 	fmt.Print("Enter the amount to withdraw: ")
 	var amount float64
 	fmt.Scan(&amount)
 
-	return amount
+	if amount <= 0 {
+		return amount, errors.New("invalid amount. must be greater than 0")
+	}
+
+	if amount > accountBalance {
+		return amount, errors.New("invalid amount. must be greater than account balance")
+	}
+
+	return amount, nil
 }
 
-func deposit() float64 {
-	fmt.Println("2. deposit")
+func deposit() (float64, error) {
 	fmt.Print("Enter the amount to deposit: ")
 	var amount float64
 	fmt.Scan(&amount)
 
-	return amount
+	if amount <= 0 {
+		return amount, errors.New("invalid amount. must be greater than 0")
+	}
+
+	return amount, nil
 }
 
 func printWelcomeMessage() {
