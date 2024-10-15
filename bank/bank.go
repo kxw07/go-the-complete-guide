@@ -17,9 +17,10 @@ func main() {
 		fmt.Print("Your choice: ")
 		fmt.Scan(&choice)
 
-		if choice == 1 {
-			fmt.Printf("Your balance is: %v\n", accountBalance)
-		} else if choice == 2 {
+		switch choice {
+		case 1:
+			fmt.Printf("Your balance is: %v\n\n", accountBalance)
+		case 2:
 			amount, err := deposit()
 
 			if err != nil {
@@ -28,8 +29,8 @@ func main() {
 			}
 
 			accountBalance += amount
-			fmt.Printf("Your new balance is: %v\n", accountBalance)
-		} else if choice == 3 {
+			fmt.Printf("Your new balance is: %v\n\n", accountBalance)
+		case 3:
 			amount, err := withdraw(accountBalance)
 
 			if err != nil {
@@ -38,11 +39,11 @@ func main() {
 			}
 
 			accountBalance -= amount
-			fmt.Printf("Your new balance is: %v\n", accountBalance)
-		} else if choice == 4 {
+			fmt.Printf("Your new balance is: %v\n\n", accountBalance)
+		case 4:
 			fmt.Println("Bye bye!")
-			break
-		} else {
+			return
+		default:
 			fmt.Print("Invalid choice\n\n")
 		}
 	}
