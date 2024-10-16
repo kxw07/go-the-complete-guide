@@ -3,10 +3,12 @@ package main
 import (
 	"errors"
 	"fmt"
+	"os"
+	"strconv"
 )
 
 func main() {
-	var accountBalance float64 = 1000
+	var accountBalance float64 = readBalanceFromFile()
 
 	printWelcomeMessage()
 
@@ -42,11 +44,33 @@ func main() {
 			fmt.Printf("Your new balance is: %v\n\n", accountBalance)
 		case 4:
 			fmt.Println("Bye bye!")
+			writeBalanceToFile(accountBalance)
 			return
 		default:
 			fmt.Print("Invalid choice\n\n")
 		}
 	}
+}
+
+func writeBalanceToFile(accountBalance float64) {
+	balanceString := fmt.Sprint(accountBalance)
+	os.WriteFile("balance.txt", []byte(balanceString), 0644)
+}
+
+func readBalanceFromFile() float64 {
+	balanceBytes, err := os.ReadFile("balance.txt")
+	if err != nil {
+		fmt.Println("Error reading balance from file")
+		return 0
+	}
+
+	balance, err := strconv.ParseFloat(string(balanceBytes), 64)
+	if err != nil {
+		fmt.Println("Error parsing balance from file")
+		return 0
+	}
+
+	return balance
 }
 
 func withdraw(accountBalance float64) (float64, error) {
