@@ -7,6 +7,8 @@ import (
 	"strconv"
 )
 
+const balanceFileName = "balance.txt"
+
 func main() {
 	var accountBalance float64 = readBalanceFromFile()
 
@@ -54,11 +56,11 @@ func main() {
 
 func writeBalanceToFile(accountBalance float64) {
 	balanceString := fmt.Sprint(accountBalance)
-	os.WriteFile("balance.txt", []byte(balanceString), 0644)
+	os.WriteFile(balanceFileName, []byte(balanceString), 0644)
 }
 
 func readBalanceFromFile() float64 {
-	balanceBytes, err := os.ReadFile("balance.txt")
+	balanceBytes, err := os.ReadFile(balanceFileName)
 	if err != nil {
 		fmt.Println("Error reading balance from file")
 		return 0
