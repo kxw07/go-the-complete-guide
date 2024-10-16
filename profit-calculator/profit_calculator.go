@@ -1,33 +1,35 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 func main() {
-
-	revenue, expenses, tax := getUserInput()
+	revenue := getUserInput("Enter the revenue: ")
+	expenses := getUserInput("Enter the expenses: ")
+	tax := getUserInput("Enter the tax(%): ")
 
 	ebt, profit, ratio := calculate(revenue, expenses, tax)
 
 	fmt.Printf("The EBT is: %.2f\n", ebt)
-	fmt.Printf("The profit is: %.2f\n", profit)
-	fmt.Printf("The ratio is: %.2f\n", ratio)
+	fmt.Printf("The PROFIT is: %.2f\n", profit)
+	fmt.Printf("The RATIO is: %.2f\n", ratio)
+
+	os.WriteFile("profit.txt", []byte(fmt.Sprintf("The EBT is: %.2f\nThe profit is: %.2f\nThe ratio is: %.2f\n", ebt, profit, ratio)), 0644)
 }
 
-func getUserInput() (float64, float64, float64) {
-	var revenue float64
-	var expenses float64
-	var tax float64
+func getUserInput(message string) float64 {
+	var input float64
 
-	fmt.Print("Enter the revenue: ")
-	fmt.Scan(&revenue)
+	fmt.Print(message)
+	fmt.Scan(&input)
 
-	fmt.Print("Enter the expenses: ")
-	fmt.Scan(&expenses)
+	if input <= 0 {
+		panic("input must be greater than 0")
+	}
 
-	fmt.Print("Enter the tax(%): ")
-	fmt.Scan(&tax)
-
-	return revenue, expenses, tax
+	return input
 }
 
 func calculate(revenue float64, expenses float64, tax float64) (float64, float64, float64) {
