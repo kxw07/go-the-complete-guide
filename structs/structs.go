@@ -29,9 +29,16 @@ func main() {
 		createdAt: time.Now(),
 	}
 
-	fmt.Printf("Your full name is %s %s.\n", user.firstName, user.lastName)
-	fmt.Printf("Your birthday is %s.\n", user.birthday)
-	fmt.Printf("Data was created at %s.\n", user.createdAt)
+	printUser(&user)
+}
+
+func printUser(user *User) {
+	fmt.Printf("Your full name is %s %s.\n", (*user).firstName, (*user).lastName)
+	fmt.Printf("Your birthday is %s.\n", (*user).birthday)
+	fmt.Printf("Data was created at %s.\n", (*user).createdAt)
+	// fmt.Printf("Your full name is %s %s.\n", user.firstName, user.lastName)
+	// fmt.Printf("Your birthday is %s.\n", user.birthday)
+	// fmt.Printf("Data was created at %s.\n", user.createdAt)
 }
 
 func getUserInput(message string) string {
