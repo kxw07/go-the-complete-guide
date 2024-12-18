@@ -2,35 +2,9 @@ package main
 
 import (
 	"fmt"
-	"time"
+
+	"github.com/kxw07/structs/user"
 )
-
-type User struct {
-	firstName string
-	lastName  string
-	birthday  string
-	createdAt time.Time
-}
-
-func (u User) outputUserInfo() {
-	fmt.Printf("Your full name is %s %s.\n", u.firstName, u.lastName)
-	fmt.Printf("Your birthday is %s.\n", u.birthday)
-	fmt.Printf("Data was created at %s.\n", u.createdAt)
-}
-
-func (u *User) clearName() {
-	u.firstName = ""
-	u.lastName = ""
-}
-
-func userConstructor(firstName string, lastName string, birthday string) *User {
-	return &User{
-		firstName: firstName,
-		lastName:  lastName,
-		birthday:  birthday,
-		createdAt: time.Now(),
-	}
-}
 
 func main() {
 	// user := User{}
@@ -42,7 +16,7 @@ func main() {
 	inputLastName := getUserInput("Please enter your last name:")
 	inputBirthday := getUserInput("Please enter your birthday:")
 
-	user := userConstructor(inputFirstName, inputLastName, inputBirthday)
+	user := user.UserConstructor(inputFirstName, inputLastName, inputBirthday)
 
 	// user := User{
 	// firstName: inputFirstName,
@@ -51,9 +25,9 @@ func main() {
 	// createdAt: time.Now(),
 	// }
 
-	user.outputUserInfo()
-	user.clearName()
-	user.outputUserInfo()
+	user.OutputUserInfo()
+	user.ClearName()
+	user.OutputUserInfo()
 }
 
 func getUserInput(message string) string {
