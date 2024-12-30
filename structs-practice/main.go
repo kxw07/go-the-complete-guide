@@ -5,55 +5,34 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"time"
+
+	"github.com/kxw07/structs-practice/note"
 )
 
-type Note struct {
-	Title   string
-	Content string
-	Created time.Time
-}
-
-func (note *Note) show() {
-	fmt.Println("Title:", note.Title)
-	fmt.Println("Content:", note.Content)
-	fmt.Println("Created:", note.Created)
-}
-
 func main() {
-	var note Note
-	var err error
-
-	note.Title, err = getUserInput("Enter the note title: ")
+	title, content, err := getNoteData()
 	if err != nil {
 		fmt.Println("Error: ", err)
 		return
 	}
 
-	note.Content, err = getUserInput("Enter the note content: ")
-	if err != nil {
-		fmt.Println("Error: ", err)
-		return
-	}
+	userNote := *note.New(title, content)
+	userNote.Show()
 
-	note.Created = time.Now()
-
-	note.show()
-
-	err = save(note)
+	err = save(userNote)
 	if err != nil {
 		fmt.Println("Error: ", err)
 		return
 	}
 }
 
-func save(note Note) error {
-	valueString, err := json.Marshal(note)
+func save(userNote note.Note) error {
+	valueString, err := json.Marshal(userNote)
 	if err != nil {
 		return err
 	}
 
-	err = os.WriteFile("note.json", []byte(valueString), 0644)
+	err = os.WriteFile("userNote.json", valueString, 0644)
 	if err != nil {
 		return err
 	}
@@ -61,10 +40,27 @@ func save(note Note) error {
 	return nil
 }
 
+func getNoteData() (string, string, error) {
+	title, err := getUserInput("Enter the note title: ")
+	if err != nil {
+		return "", "", err
+	}
+
+	content, err := getUserInput("Enter the note content: ")
+	if err != nil {
+		return "", "", err
+	}
+
+	return title, content, nil
+}
+
 func getUserInput(prompt string) (string, error) {
 	var value string
 	fmt.Print(prompt)
-	fmt.Scanln(&value)
+	_, err := fmt.Scanln(&value)
+	if err != nil {
+		return "", err
+	}
 
 	if value == "" {
 		return "", errors.New("input cannot be empty")
