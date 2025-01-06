@@ -41,7 +41,7 @@ func save(userNote note.Note) error {
 	fileName := strings.ReplaceAll(userNote.Title, " ", "_")
 	fileName = strings.ToLower(fileName)
 
-	return os.WriteFile(fileName, valueString, 0644)
+	return os.WriteFile(fileName+".json", valueString, 0644)
 }
 
 func getNoteData() (string, string, error) {
