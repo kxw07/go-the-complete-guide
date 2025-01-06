@@ -2,53 +2,64 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
 
 	"github.com/kxw07/structs-practice/note"
+	"github.com/kxw07/structs-practice/todo"
 )
 
+type saver interface {
+	Save() error
+}
+
+func save(s saver) error {
+	return s.Save()
+}
+
 func main() {
-	title, content, err := getNoteData()
+	title, content := getNoteData()
+	noteObj, err := note.New(title, content)
+	if err != nil {
+		fmt.Println("Error: ", err)
+		return
+	}
+	noteObj.Show()
+
+	todoContent := getTodoData()
+	todoObj, err := todo.New(todoContent)
 	if err != nil {
 		fmt.Println("Error: ", err)
 		return
 	}
 
-	userNote, err := note.New(title, content)
+	todoObj.Show()
+
+	err = save(noteObj)
 	if err != nil {
-		fmt.Println("Error: ", err)
+		fmt.Println("Note save error: ", err)
 		return
 	}
 
-	userNote.Show()
-
-	err = save(userNote)
+	err = save(todoObj)
 	if err != nil {
-		fmt.Println("Error: ", err)
+		fmt.Println("Todo save error: ", err)
 		return
 	}
 }
 
-func save(userNote note.Note) error {
-	valueString, err := json.Marshal(userNote)
-	if err != nil {
-		return err
-	}
-
-	fileName := strings.ReplaceAll(userNote.Title, " ", "_")
-	fileName = strings.ToLower(fileName)
-
-	return os.WriteFile(fileName+".json", valueString, 0644)
-}
-
-func getNoteData() (string, string, error) {
+func getNoteData() (string, string) {
 	title := getUserInput("Enter the note title: ")
 	content := getUserInput("Enter the note content: ")
 
-	return title, content, nil
+	return title, content
+}
+
+func getTodoData() string {
+	content := getUserInput("Enter the todo content: ")
+
+	return content
 }
 
 func getUserInput(prompt string) string {
