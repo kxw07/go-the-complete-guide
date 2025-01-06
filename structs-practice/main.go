@@ -1,10 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/kxw07/structs-practice/note"
 )
@@ -16,7 +17,12 @@ func main() {
 		return
 	}
 
-	userNote := *note.New(title, content)
+	userNote, err := note.New(title, content)
+	if err != nil {
+		fmt.Println("Error: ", err)
+		return
+	}
+
 	userNote.Show()
 
 	err = save(userNote)
@@ -32,39 +38,31 @@ func save(userNote note.Note) error {
 		return err
 	}
 
-	err = os.WriteFile("userNote.json", valueString, 0644)
-	if err != nil {
-		return err
-	}
+	fileName := strings.ReplaceAll(userNote.Title, " ", "_")
+	fileName = strings.ToLower(fileName)
 
-	return nil
+	return os.WriteFile(fileName, valueString, 0644)
 }
 
 func getNoteData() (string, string, error) {
-	title, err := getUserInput("Enter the note title: ")
-	if err != nil {
-		return "", "", err
-	}
-
-	content, err := getUserInput("Enter the note content: ")
-	if err != nil {
-		return "", "", err
-	}
+	title := getUserInput("Enter the note title: ")
+	content := getUserInput("Enter the note content: ")
 
 	return title, content, nil
 }
 
-func getUserInput(prompt string) (string, error) {
-	var value string
+func getUserInput(prompt string) string {
 	fmt.Print(prompt)
-	_, err := fmt.Scanln(&value)
+
+	reader := bufio.NewReader(os.Stdin)
+	text, err := reader.ReadString('\n')
+
 	if err != nil {
-		return "", err
+		return ""
 	}
 
-	if value == "" {
-		return "", errors.New("input cannot be empty")
-	}
+	text = strings.TrimSuffix(text, "\n")
+	text = strings.TrimSuffix(text, "\r")
 
-	return value, nil
+	return text
 }
