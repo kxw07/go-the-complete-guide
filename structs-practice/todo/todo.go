@@ -11,10 +11,6 @@ type Todo struct {
 	Content string `json:"content"`
 }
 
-func (todo Todo) Show() {
-	fmt.Println("Content:", todo.Content)
-}
-
 func New(content string) (Todo, error) {
 	if content == "" {
 		return Todo{}, errors.New("content cannot be empty")
@@ -23,6 +19,10 @@ func New(content string) (Todo, error) {
 	return Todo{
 		Content: content,
 	}, nil
+}
+
+func (todo Todo) Display() {
+	fmt.Println("Content:", todo.Content)
 }
 
 func (todo Todo) Save() error {

@@ -10,12 +10,14 @@ import (
 	"github.com/kxw07/structs-practice/todo"
 )
 
-type saver interface {
+type outputtable interface {
 	Save() error
+	Display()
 }
 
-func save(s saver) error {
-	return s.Save()
+func output(o outputtable) error {
+	o.Display()
+	return o.Save()
 }
 
 func main() {
@@ -25,7 +27,6 @@ func main() {
 		fmt.Println("Error: ", err)
 		return
 	}
-	noteObj.Show()
 
 	todoContent := getTodoData()
 	todoObj, err := todo.New(todoContent)
@@ -34,15 +35,13 @@ func main() {
 		return
 	}
 
-	todoObj.Show()
-
-	err = save(noteObj)
+	err = output(noteObj)
 	if err != nil {
 		fmt.Println("Note save error: ", err)
 		return
 	}
 
-	err = save(todoObj)
+	err = output(todoObj)
 	if err != nil {
 		fmt.Println("Todo save error: ", err)
 		return

@@ -15,12 +15,6 @@ type Note struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-func (note Note) Show() {
-	fmt.Println("Title:", note.Title)
-	fmt.Println("Content:", note.Content)
-	fmt.Println("CreatedAt:", note.CreatedAt)
-}
-
 func New(title, content string) (Note, error) {
 	if title == "" || content == "" {
 		return Note{}, errors.New("title and content cannot be empty")
@@ -31,6 +25,12 @@ func New(title, content string) (Note, error) {
 		Content:   content,
 		CreatedAt: time.Now(),
 	}, nil
+}
+
+func (note Note) Display() {
+	fmt.Println("Title:", note.Title)
+	fmt.Println("Content:", note.Content)
+	fmt.Println("CreatedAt:", note.CreatedAt)
 }
 
 func (note Note) Save() error {
