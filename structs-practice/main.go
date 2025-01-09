@@ -21,12 +21,18 @@ func output(o outputtable) error {
 }
 
 func main() {
+	printAny(aPlusB(1, 5))
+	printAny(aPlusB(1.5, 5.5))
+	printAny(aPlusB("Hello, ", "World!"))
+
 	title, content := getNoteData()
 	noteObj, err := note.New(title, content)
 	if err != nil {
 		fmt.Println("Error: ", err)
 		return
 	}
+
+	printAny(noteObj)
 
 	todoContent := getTodoData()
 	todoObj, err := todo.New(todoContent)
@@ -46,6 +52,14 @@ func main() {
 		fmt.Println("Todo save error: ", err)
 		return
 	}
+}
+
+func printAny(value any) {
+	fmt.Println(value)
+}
+
+func aPlusB[T int | float64 | string](a, b T) T {
+	return a + b
 }
 
 func getNoteData() (string, string) {
