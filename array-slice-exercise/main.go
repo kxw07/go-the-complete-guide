@@ -24,8 +24,7 @@ func main() {
 
 	// 4) Re-slice the slice from (3) and change it to contain the second
 	//		and last element of the original array.
-	hobbies_slice_one = hobbies_slice_one[:3]
-	hobbies_slice_one = hobbies_slice_one[1:]
+	hobbies_slice_one = hobbies_slice_one[1:3]
 	fmt.Println(hobbies_slice_one)
 
 	// 5) Create a "dynamic array" that contains your course goals (at least 2 goals)
@@ -50,4 +49,11 @@ func main() {
 	}
 	products = append(products, product{"phone", 3, 599.99})
 	fmt.Println(products)
+
+	// unpack list values
+	origin := []int{1, 2, 3}
+	should_be_append := []int{4, 5, 6}
+
+	origin = append(origin, should_be_append...)
+	fmt.Println(origin)
 }
