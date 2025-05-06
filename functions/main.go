@@ -2,17 +2,20 @@ package main
 
 import "fmt"
 
+type transformFunc func(int) int
+
 func main() {
 	numbers := []int{1, 2, 3, 4, 5}
+	anotherNumbers := []int{2, 3, 4, 5, 6}
 
-	doubleNumbers := transformNumbers(&numbers, doubleInt)
-	fmt.Println(doubleNumbers)
+	doubleNumbers := transformNumbers(&numbers, getTransformFunc(&anotherNumbers))
+	fmt.Println("doubleNumbers", doubleNumbers)
 
-	tripleNumbers := transformNumbers(&numbers, tripleInt)
-	fmt.Println(tripleNumbers)
+	tripleNumbers := transformNumbers(&numbers, getTransformFunc(&numbers))
+	fmt.Println("tripleNumbers", tripleNumbers)
 }
 
-func transformNumbers(numbers *[]int, transform func(int) int) []int {
+func transformNumbers(numbers *[]int, transform transformFunc) []int {
 	result := []int{}
 
 	for _, value := range *numbers {
@@ -22,10 +25,18 @@ func transformNumbers(numbers *[]int, transform func(int) int) []int {
 	return result
 }
 
-func doubleInt(number int) int {
+func getTransformFunc(numbers *[]int) transformFunc {
+	if (*numbers)[0]%2 == 0 {
+		return double
+	}
+
+	return triple
+}
+
+func double(number int) int {
 	return number * 2
 }
 
-func tripleInt(number int) int {
+func triple(number int) int {
 	return number * 3
 }
