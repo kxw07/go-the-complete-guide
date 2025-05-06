@@ -5,17 +5,17 @@ import "fmt"
 func main() {
 	numbers := []int{1, 2, 3, 4, 5}
 
-	doubleNumbers := transformNumbers(numbers, doubleInt)
+	doubleNumbers := transformNumbers(&numbers, doubleInt)
 	fmt.Println(doubleNumbers)
 
-	tripleNumbers := transformNumbers(numbers, tripleInt)
+	tripleNumbers := transformNumbers(&numbers, tripleInt)
 	fmt.Println(tripleNumbers)
 }
 
-func transformNumbers(numbers []int, transform func(int) int) []int {
+func transformNumbers(numbers *[]int, transform func(int) int) []int {
 	result := []int{}
 
-	for _, value := range numbers {
+	for _, value := range *numbers {
 		result = append(result, transform(value))
 	}
 
