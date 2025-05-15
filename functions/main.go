@@ -13,6 +13,19 @@ func main() {
 
 	tripleNumbers := transformNumbers(&numbers, getTransformFunc(&numbers))
 	fmt.Println("tripleNumbers", tripleNumbers)
+
+	fmt.Println(variadicFunction(1, 2, 3, 4, 5))
+
+	// better than above
+	fmt.Println(variadicFunction(1, numbers...))
+}
+
+func variadicFunction(first int, numbers ...int) int {
+	sum := first
+	for _, number := range numbers {
+		sum += number
+	}
+	return sum
 }
 
 func transformNumbers(numbers *[]int, transform transformFunc) []int {
