@@ -22,12 +22,12 @@ func main() {
 	fmt.Println(result)
 }
 
-func getTaxResult(valuesByHeader map[string][]int) map[int][]float64 {
-	result := make(map[int][]float64)
+func getTaxResult(valuesByHeader map[string][]float64) map[float64][]float64 {
+	result := make(map[float64][]float64)
 	for _, tax := range valuesByHeader["Tax Rates"] {
 		result[tax] = []float64{}
 		for _, price := range valuesByHeader["Prices"] {
-			result[tax] = append(result[tax], float64(price*(100+tax))/100)
+			result[tax] = append(result[tax], price*(1+tax))
 		}
 	}
 	return result

@@ -5,16 +5,16 @@ import (
 	"strings"
 )
 
-func ExtractHeader(dataMap [][]string) map[string][]int {
-	headerValueMap := make(map[string][]int)
-	for _, values := range dataMap {
-		var ints []int
-		for _, value := range values[1:] {
-			intValue, _ := strconv.Atoi(value)
-			ints = append(ints, intValue)
+func ExtractHeader(dataMap [][]string) map[string][]float64 {
+	headerValueMap := make(map[string][]float64)
+	for _, columnValues := range dataMap {
+		var valueArray []float64
+		for _, columnValue := range columnValues[1:] {
+			value, _ := strconv.ParseFloat(columnValue, 0)
+			valueArray = append(valueArray, value)
 		}
 
-		headerValueMap[values[0]] = ints
+		headerValueMap[columnValues[0]] = valueArray
 	}
 	return headerValueMap
 }
