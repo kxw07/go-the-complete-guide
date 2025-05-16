@@ -2,12 +2,10 @@ package file_ops
 
 import (
 	"bufio"
-	"fmt"
 	"os"
-	"strings"
 )
 
-func Read(fileName string) ([][]string, error) {
+func Read(fileName string) ([]string, error) {
 	file, err := os.Open(fileName)
 	if err != nil {
 		return nil, err
@@ -15,21 +13,11 @@ func Read(fileName string) ([][]string, error) {
 
 	defer file.Close()
 	scanner := bufio.NewScanner(file)
-	lineCount := 0
 
-	columnValues := make([][]string, 2)
-
+	lines := []string{}
 	for scanner.Scan() {
-		line := scanner.Text()
-		fmt.Println(line)
-
-		values := strings.Split(line, "  ")
-		for index, value := range values {
-			columnValues[index] = append(columnValues[index], value)
-		}
-
-		lineCount++
+		lines = append(lines, scanner.Text())
 	}
 
-	return columnValues, nil
+	return lines, nil
 }
