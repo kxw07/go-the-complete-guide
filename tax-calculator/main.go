@@ -1,35 +1,15 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
-	"strings"
+	"github.com/kxw07/tax-calculator/file_ops"
 )
 
 func main() {
-	file, err := os.Open("raw_data.txt")
+	columnValues, err := file_ops.Read("raw_data.txt")
 	if err != nil {
-		fmt.Println("Error opening file:", err)
+		fmt.Println("Error when handling file:", err)
 		return
-	}
-
-	defer file.Close()
-	scanner := bufio.NewScanner(file)
-	lineCount := 0
-
-	columnValues := make([][]string, 2)
-
-	for scanner.Scan() {
-		line := scanner.Text()
-		fmt.Println(line)
-
-		values := strings.Split(line, "  ")
-		for index, value := range values {
-			columnValues[index] = append(columnValues[index], value)
-		}
-
-		lineCount++
 	}
 
 	fmt.Println(columnValues)
