@@ -25,6 +25,7 @@ func getTaxResult(valuesByHeader map[string][]float64) {
 	for _, taxRate := range valuesByHeader["Tax Rates"] {
 		productInfo := product_info.NewProductInfo(taxRate, valuesByHeader["Prices"])
 		productInfo.CalculatePricesAfterTax()
+
 		fmt.Println(productInfo)
 	}
 }

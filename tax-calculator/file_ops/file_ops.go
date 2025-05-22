@@ -7,11 +7,11 @@ import (
 
 func Read(fileName string) ([]string, error) {
 	file, err := os.Open(fileName)
+	defer file.Close()
 	if err != nil {
 		return nil, err
 	}
 
-	defer file.Close()
 	scanner := bufio.NewScanner(file)
 
 	lines := []string{}
