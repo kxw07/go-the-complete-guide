@@ -2,10 +2,11 @@ package file_ops
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 )
 
-func Read(fileName string) ([]string, error) {
+func ReadPrices(fileName string) ([]float64, error) {
 	file, err := os.Open(fileName)
 	defer file.Close()
 	if err != nil {
@@ -14,10 +15,37 @@ func Read(fileName string) ([]string, error) {
 
 	scanner := bufio.NewScanner(file)
 
-	lines := []string{}
+	prices := []float64{}
 	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
+		var price float64
+		_, err := fmt.Sscanf(scanner.Text(), "%f", &price)
+		if err != nil {
+			return nil, err
+		}
+		prices = append(prices, price)
 	}
 
-	return lines, nil
+	return prices, nil
+}
+
+func ReadTaxRates(fileName string) ([]float64, error) {
+	file, err := os.Open(fileName)
+	defer file.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	scanner := bufio.NewScanner(file)
+
+	taxRates := []float64{}
+	for scanner.Scan() {
+		var taxRate float64
+		_, err := fmt.Sscanf(scanner.Text(), "%f", &taxRate)
+		if err != nil {
+			return nil, err
+		}
+		taxRates = append(taxRates, taxRate)
+	}
+
+	return taxRates, nil
 }
