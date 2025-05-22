@@ -7,6 +7,8 @@ import (
 )
 
 func main() {
+	defer handlePanic()
+
 	prices := getPrices()
 	taxRates := getTaxRates()
 
@@ -14,6 +16,12 @@ func main() {
 	productInfo.CalculatePricesAfterTax()
 
 	fmt.Println(*productInfo)
+}
+
+func handlePanic() {
+	if r := recover(); r != nil {
+		fmt.Println("catch panic:", r)
+	}
 }
 
 func getTaxRates() []float64 {
