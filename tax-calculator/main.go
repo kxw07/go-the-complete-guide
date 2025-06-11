@@ -14,8 +14,16 @@ func main() {
 
 	productInfo := product_info.NewProductInfo(taxRates, prices)
 	productInfo.CalculatePricesAfterTax()
+	writeToFile("prices_after_tax.txt", productInfo)
+}
 
-	fmt.Println(*productInfo)
+func writeToFile(fileName string, productInfo *product_info.ProductInfo) {
+	err := file_ops.WriteToFile(fileName, productInfo)
+
+	if err != nil {
+		fmt.Println("Error when write to file:", err)
+		panic("Error when write to file")
+	}
 }
 
 func handlePanic() {

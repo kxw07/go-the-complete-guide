@@ -1,9 +1,11 @@
 package product_info
 
+import "fmt"
+
 type ProductInfo struct {
-	TaxRate        []float64             `json:"tax_rate"`
-	Prices         []float64             `json:"prices"`
-	PricesAfterTax map[float64][]float64 `json:"prices_after_tax"`
+	TaxRate        []float64           `json:"tax_rate"`
+	Prices         []float64           `json:"prices"`
+	PricesAfterTax map[string][]string `json:"prices_after_tax"`
 }
 
 func NewProductInfo(taxRate []float64, prices []float64) *ProductInfo {
@@ -14,15 +16,15 @@ func NewProductInfo(taxRate []float64, prices []float64) *ProductInfo {
 }
 
 func (productInfo *ProductInfo) CalculatePricesAfterTax() {
-	taxPricesMap := make(map[float64][]float64)
+	taxPricesMap := make(map[string][]string)
 
 	for _, taxRate := range productInfo.TaxRate {
-		prices := make([]float64, len(productInfo.Prices))
-		for _, price := range productInfo.Prices {
-			prices = append(prices, price*(1+taxRate))
+		prices := make([]string, len(productInfo.Prices))
+		for index, price := range productInfo.Prices {
+			prices[index] = fmt.Sprintf("%.2f", price*(1+taxRate))
 		}
 
-		taxPricesMap[taxRate] = prices
+		taxPricesMap[fmt.Sprintf("%v", taxRate)] = prices
 	}
 
 	productInfo.PricesAfterTax = taxPricesMap

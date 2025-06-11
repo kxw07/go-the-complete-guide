@@ -2,6 +2,7 @@ package file_ops
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"os"
 )
@@ -9,6 +10,7 @@ import (
 func ReadPrices(fileName string) ([]float64, error) {
 	file, err := os.Open(fileName)
 	defer file.Close()
+
 	if err != nil {
 		return nil, err
 	}
@@ -31,6 +33,7 @@ func ReadPrices(fileName string) ([]float64, error) {
 func ReadTaxRates(fileName string) ([]float64, error) {
 	file, err := os.Open(fileName)
 	defer file.Close()
+
 	if err != nil {
 		return nil, err
 	}
@@ -48,4 +51,22 @@ func ReadTaxRates(fileName string) ([]float64, error) {
 	}
 
 	return taxRates, nil
+}
+
+func WriteToFile(fileName string, data interface{}) error {
+	file, err := os.Create(fileName)
+	defer file.Close()
+
+	if err != nil {
+		return err
+	}
+
+	encoder := json.NewEncoder(file)
+	err = encoder.Encode(data)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
