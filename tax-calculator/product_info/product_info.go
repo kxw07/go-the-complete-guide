@@ -21,8 +21,6 @@ func NewProductInfo(fileOps file_ops.FileOps, taxRate string, prices []string) *
 }
 
 func (productInfo *ProductInfo) CalculatePricesAfterTax() {
-	taxPricesMap := make(map[string][]string)
-
 	prices := make([]string, len(productInfo.Prices))
 	for index, price := range productInfo.Prices {
 		float64Price, _ := strconv.ParseFloat(price, 64)
@@ -30,9 +28,7 @@ func (productInfo *ProductInfo) CalculatePricesAfterTax() {
 		prices[index] = fmt.Sprintf("%.2f", float64Price*(1+float64TaxRate))
 	}
 
-	taxPricesMap[fmt.Sprintf("%v", productInfo.TaxRate)] = prices
-
-	err := productInfo.FileOps.WriteToFile(taxPricesMap)
+	err := productInfo.FileOps.WriteToFile(prices)
 	if err != nil {
 		fmt.Println("Error when write to file:", err)
 		panic("Error when write to file")
