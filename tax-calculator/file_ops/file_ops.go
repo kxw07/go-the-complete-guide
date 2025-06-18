@@ -8,20 +8,18 @@ import (
 )
 
 type FileOps struct {
-	InputTaxRatesFilePath string
-	InputPricesFilePath   string
-	OutputFilePath        string
+	InputPricesFilePath string
+	OutputFilePath      string
 }
 
-func New(inputTaxRatesFilePath, inputPricesFilePath, outputFilePath string) *FileOps {
-	return &FileOps{
-		InputTaxRatesFilePath: inputTaxRatesFilePath,
-		InputPricesFilePath:   inputPricesFilePath,
-		OutputFilePath:        outputFilePath,
+func New(inputPricesFilePath, outputFilePath string) FileOps {
+	return FileOps{
+		InputPricesFilePath: inputPricesFilePath,
+		OutputFilePath:      outputFilePath,
 	}
 }
 
-func (fo FileOps) ReadPrices() ([]float64, error) {
+func (fo FileOps) ReadPrices() ([]string, error) {
 	file, err := os.Open(fo.InputPricesFilePath)
 	defer file.Close()
 
@@ -31,10 +29,10 @@ func (fo FileOps) ReadPrices() ([]float64, error) {
 
 	scanner := bufio.NewScanner(file)
 
-	prices := []float64{}
+	prices := []string{}
 	for scanner.Scan() {
-		var price float64
-		_, err := fmt.Sscanf(scanner.Text(), "%f", &price)
+		var price string
+		_, err := fmt.Sscanf(scanner.Text(), "%v", &price)
 		if err != nil {
 			return nil, err
 		}
@@ -42,29 +40,6 @@ func (fo FileOps) ReadPrices() ([]float64, error) {
 	}
 
 	return prices, nil
-}
-
-func (fo FileOps) ReadTaxRates() ([]float64, error) {
-	file, err := os.Open(fo.InputTaxRatesFilePath)
-	defer file.Close()
-
-	if err != nil {
-		return nil, err
-	}
-
-	scanner := bufio.NewScanner(file)
-
-	taxRates := []float64{}
-	for scanner.Scan() {
-		var taxRate float64
-		_, err := fmt.Sscanf(scanner.Text(), "%f", &taxRate)
-		if err != nil {
-			return nil, err
-		}
-		taxRates = append(taxRates, taxRate)
-	}
-
-	return taxRates, nil
 }
 
 func (fo FileOps) WriteToFile(data interface{}) error {

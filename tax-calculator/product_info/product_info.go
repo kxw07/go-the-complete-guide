@@ -1,15 +1,20 @@
 package product_info
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/kxw07/tax-calculator/file_ops"
+	"strconv"
+)
 
 type ProductInfo struct {
-	TaxRate        []float64           `json:"tax_rate"`
-	Prices         []float64           `json:"prices"`
-	PricesAfterTax map[string][]string `json:"prices_after_tax"`
+	FileOps file_ops.FileOps `json:"-"`
+	TaxRate string           `json:"tax_rate"`
+	Prices  []string         `json:"prices"`
 }
 
-func NewProductInfo(taxRate []float64, prices []float64) *ProductInfo {
+func NewProductInfo(fileOps file_ops.FileOps, taxRate string, prices []string) *ProductInfo {
 	return &ProductInfo{
+		FileOps: fileOps,
 		TaxRate: taxRate,
 		Prices:  prices,
 	}
@@ -18,14 +23,18 @@ func NewProductInfo(taxRate []float64, prices []float64) *ProductInfo {
 func (productInfo *ProductInfo) CalculatePricesAfterTax() {
 	taxPricesMap := make(map[string][]string)
 
-	for _, taxRate := range productInfo.TaxRate {
-		prices := make([]string, len(productInfo.Prices))
-		for index, price := range productInfo.Prices {
-			prices[index] = fmt.Sprintf("%.2f", price*(1+taxRate))
-		}
-
-		taxPricesMap[fmt.Sprintf("%v", taxRate)] = prices
+	prices := make([]string, len(productInfo.Prices))
+	for index, price := range productInfo.Prices {
+		float64Price, _ := strconv.ParseFloat(price, 64)
+		float64TaxRate, _ := strconv.ParseFloat(productInfo.TaxRate, 64)
+		prices[index] = fmt.Sprintf("%.2f", float64Price*(1+float64TaxRate))
 	}
 
-	productInfo.PricesAfterTax = taxPricesMap
+	taxPricesMap[fmt.Sprintf("%v", productInfo.TaxRate)] = prices
+
+	err := productInfo.FileOps.WriteToFile(taxPricesMap)
+	if err != nil {
+		fmt.Println("Error when write to file:", err)
+		panic("Error when write to file")
+	}
 }
