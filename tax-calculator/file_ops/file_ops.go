@@ -42,7 +42,7 @@ func (fo FileOps) ReadPrices() ([]string, error) {
 	return prices, nil
 }
 
-func (fo FileOps) WriteToFile(data interface{}) error {
+func (fo FileOps) Write(data interface{}) error {
 	file, err := os.Create(fo.OutputFilePath)
 	defer file.Close()
 

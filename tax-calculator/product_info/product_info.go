@@ -2,21 +2,21 @@ package product_info
 
 import (
 	"fmt"
-	"github.com/kxw07/tax-calculator/file_ops"
+	"github.com/kxw07/tax-calculator/io_executor"
 	"strconv"
 )
 
 type ProductInfo struct {
-	FileOps file_ops.FileOps `json:"-"`
-	TaxRate string           `json:"tax_rate"`
-	Prices  []string         `json:"prices"`
+	IOExecutor io_executor.IOExecutor `json:"-"`
+	TaxRate    string                 `json:"tax_rate"`
+	Prices     []string               `json:"prices"`
 }
 
-func NewProductInfo(fileOps file_ops.FileOps, taxRate string, prices []string) *ProductInfo {
+func NewProductInfo(io io_executor.IOExecutor, taxRate string, prices []string) *ProductInfo {
 	return &ProductInfo{
-		FileOps: fileOps,
-		TaxRate: taxRate,
-		Prices:  prices,
+		IOExecutor: io,
+		TaxRate:    taxRate,
+		Prices:     prices,
 	}
 }
 
@@ -28,7 +28,7 @@ func (productInfo *ProductInfo) CalculatePricesAfterTax() {
 		prices[index] = fmt.Sprintf("%.2f", float64Price*(1+float64TaxRate))
 	}
 
-	err := productInfo.FileOps.WriteToFile(prices)
+	err := productInfo.IOExecutor.Write(prices)
 	if err != nil {
 		fmt.Println("Error when write to file:", err)
 		panic("Error when write to file")
