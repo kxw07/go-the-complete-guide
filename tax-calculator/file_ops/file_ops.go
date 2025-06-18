@@ -7,8 +7,22 @@ import (
 	"os"
 )
 
-func ReadPrices(fileName string) ([]float64, error) {
-	file, err := os.Open(fileName)
+type FileOps struct {
+	InputTaxRatesFilePath string
+	InputPricesFilePath   string
+	OutputFilePath        string
+}
+
+func New(inputTaxRatesFilePath, inputPricesFilePath, outputFilePath string) *FileOps {
+	return &FileOps{
+		InputTaxRatesFilePath: inputTaxRatesFilePath,
+		InputPricesFilePath:   inputPricesFilePath,
+		OutputFilePath:        outputFilePath,
+	}
+}
+
+func (fo FileOps) ReadPrices() ([]float64, error) {
+	file, err := os.Open(fo.InputPricesFilePath)
 	defer file.Close()
 
 	if err != nil {
@@ -30,8 +44,8 @@ func ReadPrices(fileName string) ([]float64, error) {
 	return prices, nil
 }
 
-func ReadTaxRates(fileName string) ([]float64, error) {
-	file, err := os.Open(fileName)
+func (fo FileOps) ReadTaxRates() ([]float64, error) {
+	file, err := os.Open(fo.InputTaxRatesFilePath)
 	defer file.Close()
 
 	if err != nil {
@@ -53,8 +67,8 @@ func ReadTaxRates(fileName string) ([]float64, error) {
 	return taxRates, nil
 }
 
-func WriteToFile(fileName string, data interface{}) error {
-	file, err := os.Create(fileName)
+func (fo FileOps) WriteToFile(data interface{}) error {
+	file, err := os.Create(fo.OutputFilePath)
 	defer file.Close()
 
 	if err != nil {

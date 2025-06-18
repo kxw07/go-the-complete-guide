@@ -9,16 +9,18 @@ import (
 func main() {
 	defer handlePanic()
 
-	prices := getPrices()
-	taxRates := getTaxRates()
+	fileOps := file_ops.New("tax_rates.txt", "prices.txt", "prices_after_tax.txt")
+
+	prices := getPrices(*fileOps)
+	taxRates := getTaxRates(*fileOps)
 
 	productInfo := product_info.NewProductInfo(taxRates, prices)
 	productInfo.CalculatePricesAfterTax()
-	writeToFile("prices_after_tax.txt", productInfo)
+	writeToFile(*fileOps, productInfo)
 }
 
-func writeToFile(fileName string, productInfo *product_info.ProductInfo) {
-	err := file_ops.WriteToFile(fileName, productInfo)
+func writeToFile(fileOps file_ops.FileOps, productInfo *product_info.ProductInfo) {
+	err := fileOps.WriteToFile(productInfo)
 
 	if err != nil {
 		fmt.Println("Error when write to file:", err)
@@ -32,8 +34,8 @@ func handlePanic() {
 	}
 }
 
-func getTaxRates() []float64 {
-	taxRates, err := file_ops.ReadTaxRates("tax_rates.txt")
+func getTaxRates(fileOps file_ops.FileOps) []float64 {
+	taxRates, err := fileOps.ReadTaxRates()
 	if err != nil {
 		fmt.Println("Error when getTaxRates:", err)
 		panic("Error when getTaxRates")
@@ -41,8 +43,8 @@ func getTaxRates() []float64 {
 	return taxRates
 }
 
-func getPrices() []float64 {
-	prices, err := file_ops.ReadPrices("prices.txt")
+func getPrices(fileOps file_ops.FileOps) []float64 {
+	prices, err := fileOps.ReadPrices()
 	if err != nil {
 		fmt.Println("Error when getPrices:", err)
 		panic("Error when getPrices")
