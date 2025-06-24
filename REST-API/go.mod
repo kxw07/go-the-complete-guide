@@ -2,7 +2,9 @@ module github.com/kxw07/REST-API
 
 go 1.23.4
 
-require github.com/gin-gonic/gin v1.10.1
+require (
+	github.com/gin-gonic/gin v1.10.1
+)
 
 require (
 	github.com/bytedance/sonic v1.13.3 // indirect
