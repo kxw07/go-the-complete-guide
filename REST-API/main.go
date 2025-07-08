@@ -1,15 +1,18 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/kxw07/REST-API/model"
+	"github.com/kxw07/REST-API/storage"
+	"log/slog"
 	"net/http"
-	"time"
 )
 
 func main() {
-	fmt.Println(time.Time{})
+	slog.Info("starting REST API server")
+	
+	storage.InitDB()
+
 	server := gin.Default()
 	server.SetTrustedProxies([]string{"127.0.0.1"})
 
