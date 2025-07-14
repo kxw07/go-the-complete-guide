@@ -18,6 +18,7 @@ func main() {
 	server.SetTrustedProxies([]string{"127.0.0.1"})
 
 	server.GET("/event/all", eventHandler.GetEvents)
+	server.GET("/event/:id", eventHandler.GetEvent)
 	server.POST("/event", eventHandler.CreateEvent)
 
 	server.Run(":8080")

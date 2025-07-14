@@ -10,6 +10,10 @@ func (svc Service) getEvents() []Event {
 	return svc.repo.getAllEvents()
 }
 
+func (svc Service) getEvent(id int64) Event {
+	return svc.repo.getEvent(id)
+}
+
 func (svc Service) createEvent(event Event) (Event, error) {
 	event.UserID = rand.Int()
 

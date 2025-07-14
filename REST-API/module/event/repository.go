@@ -36,7 +36,7 @@ func (rep Repository) getAllEvents() []Event {
 	return events
 }
 
-func (rep Repository) getEvent(eventId int) Event {
+func (rep Repository) getEvent(eventId int64) Event {
 	getEventById := `
 	SELECT id, user_id, name, description, location, date_time
 	FROM events

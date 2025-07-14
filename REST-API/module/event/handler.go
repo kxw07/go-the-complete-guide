@@ -3,6 +3,7 @@ package event
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 type Handler struct {
@@ -29,4 +30,15 @@ func (handler Handler) CreateEvent(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusCreated, gin.H{"message": "Event created.", "event": result})
+}
+
+func (handler Handler) GetEvent(context *gin.Context) {
+	eventId, err := strconv.ParseInt(context.Param("id"), 10, 64)
+
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid event ID."})
+		return
+	}
+
+	context.JSON(http.StatusOK, handler.svc.getEvent(eventId))
 }
