@@ -11,7 +11,12 @@ type Handler struct {
 }
 
 func (handler Handler) GetEvents(context *gin.Context) {
-	context.JSON(http.StatusOK, handler.svc.getEvents())
+	events, err := handler.svc.getEvents()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve events."})
+		return
+	}
+	context.JSON(http.StatusOK, events)
 }
 
 func (handler Handler) CreateEvent(context *gin.Context) {
@@ -40,5 +45,12 @@ func (handler Handler) GetEvent(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, handler.svc.getEvent(eventId))
+	event, err := handler.svc.getEvent(eventId)
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve event."})
+		return
+	}
+
+	context.JSON(http.StatusOK, event)
 }

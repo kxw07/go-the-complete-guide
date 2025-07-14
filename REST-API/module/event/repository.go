@@ -8,7 +8,7 @@ import (
 type Repository struct {
 }
 
-func (rep Repository) getAllEvents() []Event {
+func (rep Repository) getAllEvents() ([]Event, error) {
 	getEvents := `
 	SELECT id, user_id, name, description, location, date_time
 	FROM events
@@ -16,8 +16,7 @@ func (rep Repository) getAllEvents() []Event {
 
 	rows, err := storage.DB.Query(getEvents)
 	if err != nil {
-		slog.Error("error when querying events", "error", err)
-		return nil
+		return nil, err
 	}
 
 	defer rows.Close()
@@ -27,16 +26,15 @@ func (rep Repository) getAllEvents() []Event {
 		var event Event
 		err := rows.Scan(&event.ID, &event.UserID, &event.Name, &event.Description, &event.Location, &event.DateTime)
 		if err != nil {
-			slog.Error("error when scanning row", "error", err)
-			continue
+			return nil, err
 		}
 		events = append(events, event)
 	}
 
-	return events
+	return events, nil
 }
 
-func (rep Repository) getEvent(eventId int64) Event {
+func (rep Repository) getEvent(eventId int64) (Event, error) {
 	getEventById := `
 	SELECT id, user_id, name, description, location, date_time
 	FROM events
@@ -45,17 +43,15 @@ func (rep Repository) getEvent(eventId int64) Event {
 
 	row := storage.DB.QueryRow(getEventById, eventId)
 	if row.Err() != nil {
-		slog.Error("error when querying event by id", "error", row.Err())
-		return Event{}
+		return Event{}, row.Err()
 	}
 	var event Event
 	err := row.Scan(&event.ID, &event.UserID, &event.Name, &event.Description, &event.Location, &event.DateTime)
 	if err != nil {
-		slog.Error("error when scanning row", "error", err)
-		return Event{}
+		return Event{}, err
 	}
 
-	return event
+	return event, nil
 }
 
 func (rep Repository) createEvent(event Event) (Event, error) {

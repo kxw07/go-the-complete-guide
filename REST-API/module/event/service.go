@@ -6,11 +6,11 @@ type Service struct {
 	repo Repository
 }
 
-func (svc Service) getEvents() []Event {
+func (svc Service) getEvents() ([]Event, error) {
 	return svc.repo.getAllEvents()
 }
 
-func (svc Service) getEvent(id int64) Event {
+func (svc Service) getEvent(id int64) (Event, error) {
 	return svc.repo.getEvent(id)
 }
 
