@@ -10,7 +10,14 @@ type Handler struct {
 	svc Service
 }
 
-func (handler Handler) GetEvents(context *gin.Context) {
+func (handler Handler) RegisterRoutes(server *gin.Engine) {
+	server.GET("/event/all", handler.getEvents)
+	server.GET("/event/:id", handler.getEvent)
+	server.POST("/event", handler.createEvent)
+	server.PUT("/event", handler.updateEvent)
+}
+
+func (handler Handler) getEvents(context *gin.Context) {
 	events, err := handler.svc.getEvents()
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve events."})
@@ -19,7 +26,7 @@ func (handler Handler) GetEvents(context *gin.Context) {
 	context.JSON(http.StatusOK, events)
 }
 
-func (handler Handler) CreateEvent(context *gin.Context) {
+func (handler Handler) createEvent(context *gin.Context) {
 	var event Event
 	err := context.ShouldBindJSON(&event)
 
@@ -37,7 +44,7 @@ func (handler Handler) CreateEvent(context *gin.Context) {
 	context.JSON(http.StatusCreated, gin.H{"message": "Event created.", "event": result})
 }
 
-func (handler Handler) GetEvent(context *gin.Context) {
+func (handler Handler) getEvent(context *gin.Context) {
 	eventId, err := strconv.ParseInt(context.Param("id"), 10, 64)
 
 	if err != nil {
@@ -53,4 +60,22 @@ func (handler Handler) GetEvent(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusOK, event)
+}
+
+func (handler Handler) updateEvent(context *gin.Context) {
+	var event Event
+	err := context.ShouldBindJSON(&event)
+
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	result, err := handler.svc.updateEvent(event)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update event."})
+		return
+	}
+
+	context.JSON(http.StatusCreated, gin.H{"message": "Event updated.", "event": result})
 }

@@ -2,13 +2,14 @@
     request.variables.set("timestamp", new Date().toISOString());
 %}
 
-POST http://127.0.0.1:8080/event
+PUT http://127.0.0.1:8080/event
 Content-Type: application/json
 
 {
-  "userId": "12345",
-  "name": "New Event",
-  "description": "This is a new event created via HTTP POST request.",
+  "id": 2,
+  "userId": "67890",
+  "name": "Event Updated",
+  "description": "This is a new event updated via HTTP PUT request.",
   "location": "123 Event St, Event City, EV 12345",
   "dateTime": "{{timestamp}}"
 }

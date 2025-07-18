@@ -19,3 +19,7 @@ func (svc Service) createEvent(event Event) (Event, error) {
 
 	return svc.repo.createEvent(event)
 }
+
+func (svc Service) updateEvent(event Event) (Event, error) {
+	return svc.repo.updateEvent(event)
+}
