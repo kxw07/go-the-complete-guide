@@ -23,3 +23,7 @@ func (svc Service) createEvent(event Event) (Event, error) {
 func (svc Service) updateEvent(event Event) (Event, error) {
 	return svc.repo.updateEvent(event)
 }
+
+func (svc Service) deleteEvent(id int64) error {
+	return svc.repo.deleteEvent(id)
+}

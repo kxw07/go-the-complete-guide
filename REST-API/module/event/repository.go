@@ -9,12 +9,12 @@ type Repository struct {
 }
 
 func (rep Repository) getAllEvents() ([]Event, error) {
-	getEvents := `
+	getEventsSql := `
 	SELECT id, user_id, name, description, location, date_time
 	FROM events
 	`
 
-	rows, err := storage.DB.Query(getEvents)
+	rows, err := storage.DB.Query(getEventsSql)
 	if err != nil {
 		return nil, err
 	}
@@ -35,13 +35,13 @@ func (rep Repository) getAllEvents() ([]Event, error) {
 }
 
 func (rep Repository) getEvent(eventId int64) (Event, error) {
-	getEventById := `
+	getEventByIdSql := `
 	SELECT id, user_id, name, description, location, date_time
 	FROM events
 	WHERE id = ?
 	`
 
-	row := storage.DB.QueryRow(getEventById, eventId)
+	row := storage.DB.QueryRow(getEventByIdSql, eventId)
 	if row.Err() != nil {
 		return Event{}, row.Err()
 	}
@@ -55,7 +55,7 @@ func (rep Repository) getEvent(eventId int64) (Event, error) {
 }
 
 func (rep Repository) createEvent(event Event) (Event, error) {
-	insertEvent := `
+	insertEventSql := `
 	INSERT INTO events (user_id, name, description, location, date_time)
 	VALUES (?, ?, ?, ?, ?)
 	RETURNING id, user_id, name, description, location, date_time
@@ -63,7 +63,7 @@ func (rep Repository) createEvent(event Event) (Event, error) {
 
 	var result Event
 	err := storage.DB.
-		QueryRow(insertEvent, event.UserID, event.Name, event.Description, event.Location, event.DateTime).
+		QueryRow(insertEventSql, event.UserID, event.Name, event.Description, event.Location, event.DateTime).
 		Scan(&result.ID, &result.UserID, &result.Name, &result.Description, &result.Location, &result.DateTime)
 
 	if err != nil {
@@ -75,8 +75,6 @@ func (rep Repository) createEvent(event Event) (Event, error) {
 }
 
 func (rep Repository) updateEvent(event Event) (Event, error) {
-	slog.Info("Updating event", "eventId", event.ID, "event", event)
-
 	updateEventSql := `
 	UPDATE events
 	SET name = ?, description = ?, location = ?, date_time = ?
@@ -95,4 +93,18 @@ func (rep Repository) updateEvent(event Event) (Event, error) {
 	}
 
 	return result, nil
+}
+
+func (rep Repository) deleteEvent(id int64) error {
+	deleteEventSql := `
+	DELETE FROM events WHERE id = ?
+	`
+	_, err := storage.DB.Exec(deleteEventSql, id)
+
+	if err != nil {
+		slog.Error("error when deleting event", "error", err)
+		return err
+	}
+
+	return nil
 }

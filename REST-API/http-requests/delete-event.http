@@ -1,0 +1,6 @@
+< {%
+    request.variables.set("timestamp", new Date().toISOString());
+%}
+
+DELETE http://127.0.0.1:8080/event/2
+Content-Type: application/json

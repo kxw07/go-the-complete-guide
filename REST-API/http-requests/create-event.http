@@ -6,7 +6,6 @@ POST http://127.0.0.1:8080/event
 Content-Type: application/json
 
 {
-  "userId": "12345",
   "name": "New Event",
   "description": "This is a new event created via HTTP POST request.",
   "location": "123 Event St, Event City, EV 12345",
