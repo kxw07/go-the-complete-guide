@@ -5,8 +5,8 @@ import (
 )
 
 type Event struct {
-	ID          int
-	UserID      int       `binding:"required"`
+	ID          int64     `json:"id,omitempty"`
+	UserID      int64     `json:"userId,omitempty"`
 	Name        string    `binding:"required"`
 	Description string    `binding:"required"`
 	Location    string    `binding:"required"`

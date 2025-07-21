@@ -14,7 +14,7 @@ func (handler Handler) RegisterRoutes(server *gin.Engine) {
 	server.GET("/event/all", handler.getEvents)
 	server.GET("/event/:id", handler.getEvent)
 	server.POST("/event", handler.createEvent)
-	server.PUT("/event", handler.updateEvent)
+	server.PUT("/event/:id", handler.updateEvent)
 }
 
 func (handler Handler) getEvents(context *gin.Context) {
@@ -63,13 +63,17 @@ func (handler Handler) getEvent(context *gin.Context) {
 }
 
 func (handler Handler) updateEvent(context *gin.Context) {
+	eventId, err := strconv.ParseInt(context.Param("id"), 10, 64)
+
 	var event Event
-	err := context.ShouldBindJSON(&event)
+	err = context.ShouldBindJSON(&event)
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	event.ID = eventId
 
 	result, err := handler.svc.updateEvent(event)
 	if err != nil {

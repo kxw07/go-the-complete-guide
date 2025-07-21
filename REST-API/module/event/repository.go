@@ -75,17 +75,19 @@ func (rep Repository) createEvent(event Event) (Event, error) {
 }
 
 func (rep Repository) updateEvent(event Event) (Event, error) {
+	slog.Info("Updating event", "eventId", event.ID, "event", event)
+
 	updateEventSql := `
 	UPDATE events
-	SET user_id = ?, name = ?, description = ?, location = ?, date_time = ?
+	SET name = ?, description = ?, location = ?, date_time = ?
 	WHERE id = ?
-	RETURNING id, user_id, name, description, location, date_time
+	RETURNING name, description, location, date_time
 	`
 
 	var result Event
 	err := storage.DB.
-		QueryRow(updateEventSql, event.UserID, event.Name, event.Description, event.Location, event.DateTime, event.ID).
-		Scan(&result.ID, &result.UserID, &result.Name, &result.Description, &result.Location, &result.DateTime)
+		QueryRow(updateEventSql, event.Name, event.Description, event.Location, event.DateTime, event.ID).
+		Scan(&result.Name, &result.Description, &result.Location, &result.DateTime)
 
 	if err != nil {
 		slog.Error("error when updating event", "error", err)

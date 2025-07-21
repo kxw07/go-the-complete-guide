@@ -15,7 +15,7 @@ func (svc Service) getEvent(id int64) (Event, error) {
 }
 
 func (svc Service) createEvent(event Event) (Event, error) {
-	event.UserID = rand.Int()
+	event.UserID = rand.Int63()
 
 	return svc.repo.createEvent(event)
 }
