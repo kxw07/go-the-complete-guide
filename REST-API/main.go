@@ -12,7 +12,10 @@ func main() {
 	slog.Info("starting REST API server")
 
 	server := gin.Default()
-	server.SetTrustedProxies([]string{"127.0.0.1"})
+	err := server.SetTrustedProxies([]string{"127.0.0.1"})
+	if err != nil {
+		return
+	}
 
 	sto := storage.NewStorage()
 	userRepository := user.NewRepository(sto)
@@ -25,5 +28,8 @@ func main() {
 	eventHandler := event.NewHandler(eventService)
 	eventHandler.RegisterRoutes(server)
 
-	server.Run(":8080")
+	err = server.Run(":8080")
+	if err != nil {
+		return
+	}
 }

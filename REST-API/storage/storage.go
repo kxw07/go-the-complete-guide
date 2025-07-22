@@ -22,7 +22,7 @@ func NewStorage() *Storage {
 	return &sto
 }
 
-func (sto Storage) GetDB() *sql.DB {
+func (sto *Storage) GetDB() *sql.DB {
 	if sto.db == nil {
 		slog.Error("Database not initialized.")
 		panic("Database not initialized.")
@@ -31,18 +31,18 @@ func (sto Storage) GetDB() *sql.DB {
 	return sto.db
 }
 
-func (sto Storage) initDB() *sql.DB {
+func (sto *Storage) initDB() *sql.DB {
 	var err error
-	sto.db, err = sql.Open("sqlite3", "api.db")
+	db, err := sql.Open("sqlite3", "api.db")
 
 	if err != nil {
 		panic("Could not connect to database.")
 	}
 
-	return sto.db
+	return db
 }
 
-func (sto Storage) createTable() {
+func (sto *Storage) createTable() {
 	createUsersTable := `
 	CREATE TABLE IF NOT EXISTS users (
     	id INTEGER PRIMARY KEY AUTOINCREMENT,
