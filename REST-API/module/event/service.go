@@ -3,7 +3,11 @@ package event
 import "math/rand"
 
 type Service struct {
-	repo Repository
+	repo *Repository
+}
+
+func NewService(repo *Repository) *Service {
+	return &Service{repo: repo}
 }
 
 func (svc Service) getEvents() ([]Event, error) {

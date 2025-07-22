@@ -6,6 +6,11 @@ import (
 )
 
 type Repository struct {
+	sto *storage.Storage
+}
+
+func NewRepository(sto *storage.Storage) *Repository {
+	return &Repository{sto: sto}
 }
 
 func (rep Repository) getAllEvents() ([]Event, error) {
@@ -14,7 +19,7 @@ func (rep Repository) getAllEvents() ([]Event, error) {
 	FROM events
 	`
 
-	rows, err := storage.DB.Query(getEventsSql)
+	rows, err := rep.sto.GetDB().Query(getEventsSql)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +46,7 @@ func (rep Repository) getEvent(eventId int64) (Event, error) {
 	WHERE id = ?
 	`
 
-	row := storage.DB.QueryRow(getEventByIdSql, eventId)
+	row := rep.sto.GetDB().QueryRow(getEventByIdSql, eventId)
 	if row.Err() != nil {
 		return Event{}, row.Err()
 	}
@@ -62,7 +67,7 @@ func (rep Repository) createEvent(event Event) (Event, error) {
 	`
 
 	var result Event
-	err := storage.DB.
+	err := rep.sto.GetDB().
 		QueryRow(insertEventSql, event.UserID, event.Name, event.Description, event.Location, event.DateTime).
 		Scan(&result.ID, &result.UserID, &result.Name, &result.Description, &result.Location, &result.DateTime)
 
@@ -83,7 +88,7 @@ func (rep Repository) updateEvent(event Event) (Event, error) {
 	`
 
 	var result Event
-	err := storage.DB.
+	err := rep.sto.GetDB().
 		QueryRow(updateEventSql, event.Name, event.Description, event.Location, event.DateTime, event.ID).
 		Scan(&result.Name, &result.Description, &result.Location, &result.DateTime)
 
@@ -99,7 +104,7 @@ func (rep Repository) deleteEvent(id int64) error {
 	deleteEventSql := `
 	DELETE FROM events WHERE id = ?
 	`
-	_, err := storage.DB.Exec(deleteEventSql, id)
+	_, err := rep.sto.GetDB().Exec(deleteEventSql, id)
 
 	if err != nil {
 		slog.Error("error when deleting event", "error", err)

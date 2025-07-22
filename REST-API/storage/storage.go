@@ -6,30 +6,50 @@ import (
 	"log/slog"
 )
 
-var DB *sql.DB
+type Storage struct {
+	db *sql.DB
+}
 
-func InitDB() {
+func NewStorage() *Storage {
+	var sto Storage
+	sto.db = sto.initDB()
+
+	sto.db.SetMaxOpenConns(10)
+	sto.db.SetMaxIdleConns(5)
+
+	sto.createTable()
+
+	return &sto
+}
+
+func (sto Storage) GetDB() *sql.DB {
+	if sto.db == nil {
+		slog.Error("Database not initialized.")
+		panic("Database not initialized.")
+	}
+
+	return sto.db
+}
+
+func (sto Storage) initDB() *sql.DB {
 	var err error
-	DB, err = sql.Open("sqlite3", "api.db")
+	sto.db, err = sql.Open("sqlite3", "api.db")
 
 	if err != nil {
 		panic("Could not connect to database.")
 	}
 
-	DB.SetMaxOpenConns(10)
-	DB.SetMaxIdleConns(5)
-
-	createTable()
+	return sto.db
 }
 
-func createTable() {
+func (sto Storage) createTable() {
 	createUsersTable := `
 	CREATE TABLE IF NOT EXISTS users (
     	id INTEGER PRIMARY KEY AUTOINCREMENT,
     	username TEXT NOT NULL UNIQUE,
     	password TEXT NOT NULL
 	)`
-	_, err := DB.Exec(createUsersTable)
+	_, err := sto.db.Exec(createUsersTable)
 	if err != nil {
 		slog.Error("Could not create table: users")
 		panic(err)
@@ -48,7 +68,7 @@ func createTable() {
 		FOREIGN KEY (user_id) REFERENCES users(id)
 	)
 	`
-	_, err = DB.Exec(createEventsTable)
+	_, err = sto.db.Exec(createEventsTable)
 	if err != nil {
 		slog.Error("Could not create table: events")
 		panic(err)

@@ -5,7 +5,13 @@ import (
 	"log/slog"
 )
 
-type Repository struct{}
+type Repository struct {
+	sto *storage.Storage
+}
+
+func NewRepository(sto *storage.Storage) *Repository {
+	return &Repository{sto: sto}
+}
 
 func (rep Repository) save(user User) (User, error) {
 	sql := `
@@ -13,7 +19,7 @@ func (rep Repository) save(user User) (User, error) {
 	VALUES (?, ?)
 	`
 
-	stmt, err := storage.DB.Prepare(sql)
+	stmt, err := rep.sto.GetDB().Prepare(sql)
 	if err != nil {
 		slog.Error("Could not save user", "error", err)
 	}

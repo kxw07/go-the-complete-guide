@@ -6,7 +6,11 @@ import (
 )
 
 type Handler struct {
-	svc Service
+	svc *Service
+}
+
+func NewHandler(svc *Service) *Handler {
+	return &Handler{svc: svc}
 }
 
 func (handler Handler) RegisterRoutes(server *gin.Engine) {
