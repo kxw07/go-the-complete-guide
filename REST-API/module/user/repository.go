@@ -36,7 +36,7 @@ func (rep Repository) save(user User) (User, error) {
 	return user, nil
 }
 
-func (rep Repository) get(email string) (User, error) {
+func (rep Repository) get(user User) (User, error) {
 	sql := `
 	SELECT id, password FROM users WHERE username = ?
 	`
@@ -49,8 +49,7 @@ func (rep Repository) get(email string) (User, error) {
 
 	defer stmt.Close()
 
-	var user User
-	err = stmt.QueryRow(email).Scan(&user.ID, &user.Password)
+	err = stmt.QueryRow(user.Email).Scan(&user.ID, &user.Password)
 	if err != nil {
 		slog.Error("Could not execute get user statement", "error", err)
 		return User{}, nil
