@@ -14,7 +14,8 @@ func NewHandler(svc *Service) *Handler {
 }
 
 func (handler Handler) RegisterRoutes(server *gin.Engine) {
-	server.POST("/user", handler.signup)
+	server.POST("/user/signup", handler.signup)
+	server.POST("/user/login", handler.login)
 }
 
 func (handler Handler) signup(context *gin.Context) {
@@ -32,4 +33,20 @@ func (handler Handler) signup(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusCreated, gin.H{"message": "User created successfully.", "user": user})
+}
+
+func (handler Handler) login(context *gin.Context) {
+	var user User
+	if err := context.ShouldBindJSON(&user); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input."})
+		return
+	}
+
+	err := handler.svc.login(user)
+	if err != nil {
+		context.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password."})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"message": "Login successful."})
 }

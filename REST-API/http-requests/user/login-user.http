@@ -2,10 +2,10 @@
     request.variables.set("timestamp", new Date().toISOString());
 %}
 
-POST http://127.0.0.1:8080/user/signup
+POST http://127.0.0.1:8080/user/login
 Content-Type: application/json
 
 {
-  "email": "user456@gmail.com",
+  "email": "user789@gmail.com",
   "password": "This is demo."
 }

@@ -1,6 +1,9 @@
 package user
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"errors"
+	"golang.org/x/crypto/bcrypt"
+)
 
 type Service struct {
 	repo *Repository
@@ -16,11 +19,28 @@ func (svc Service) signup(user User) (User, error) {
 		return User{}, err
 	}
 
-	user.Password = string(hashValue)
+	user.Password = hashValue
 
 	return svc.repo.save(user)
 }
 
-func (svc Service) hashPassword(password string) ([]byte, error) {
-	return bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
+func (svc Service) login(user User) error {
+	storedValue := svc.repo.get(user.Email)
+	verifiedResult := svc.verifyPassword(user.Password, storedValue)
+
+	if !verifiedResult {
+		return errors.New("verified failed")
+	}
+
+	return nil
+}
+
+func (svc Service) verifyPassword(inputValue, storedValue string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(storedValue), []byte(inputValue))
+	return err == nil
+}
+
+func (svc Service) hashPassword(password string) (string, error) {
+	hashValue, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
+	return string(hashValue), err
 }
