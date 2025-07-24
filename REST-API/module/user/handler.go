@@ -2,6 +2,7 @@ package user
 
 import (
 	"github.com/gin-gonic/gin"
+	"log/slog"
 	"net/http"
 )
 
@@ -21,13 +22,14 @@ func (handler Handler) RegisterRoutes(server *gin.Engine) {
 func (handler Handler) signup(context *gin.Context) {
 	var user User
 	if err := context.ShouldBindJSON(&user); err != nil {
+		slog.Info("Signup: bind json failed", "error", err)
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input."})
 		return
 	}
 
 	user, err := handler.svc.signup(user)
-
 	if err != nil {
+		slog.Info("Signup: signup failed", "error", err)
 		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user."})
 		return
 	}
@@ -38,15 +40,17 @@ func (handler Handler) signup(context *gin.Context) {
 func (handler Handler) login(context *gin.Context) {
 	var user User
 	if err := context.ShouldBindJSON(&user); err != nil {
+		slog.Info("Login: bind json failed", "error", err)
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input."})
 		return
 	}
 
-	err := handler.svc.login(user)
+	token, err := handler.svc.login(user)
 	if err != nil {
+		slog.Info("Login: login failed", "error", err)
 		context.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password."})
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"message": "Login successful."})
+	context.JSON(http.StatusOK, gin.H{"message": "Login successful.", "token": token})
 }

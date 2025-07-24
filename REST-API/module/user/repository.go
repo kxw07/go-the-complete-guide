@@ -36,25 +36,25 @@ func (rep Repository) save(user User) (User, error) {
 	return user, nil
 }
 
-func (rep Repository) get(email string) string {
+func (rep Repository) get(email string) (User, error) {
 	sql := `
-	SELECT password FROM users WHERE username = ?
+	SELECT id, password FROM users WHERE username = ?
 	`
 
 	stmt, err := rep.sto.GetDB().Prepare(sql)
 	if err != nil {
 		slog.Error("Could not prepare get user statement", "error", err)
-		return ""
+		return User{}, nil
 	}
 
 	defer stmt.Close()
 
-	var password string
-	err = stmt.QueryRow(email).Scan(&password)
+	var user User
+	err = stmt.QueryRow(email).Scan(&user.ID, &user.Password)
 	if err != nil {
 		slog.Error("Could not execute get user statement", "error", err)
-		return ""
+		return User{}, nil
 	}
 
-	return password
+	return user, nil
 }
