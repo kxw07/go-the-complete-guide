@@ -47,7 +47,7 @@ func (handler Handler) getEvents(context *gin.Context) {
 		return
 	}
 
-	events, err := handler.svc.getEvents()
+	events, err := handler.svc.getEvents(userId)
 	if err != nil {
 		slog.Info("getEvents: bind json failed", "error", err)
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to retrieve events."})
@@ -57,15 +57,20 @@ func (handler Handler) getEvents(context *gin.Context) {
 }
 
 func (handler Handler) createEvent(context *gin.Context) {
+	userId, err := handler.verifyToken(context)
+	if err != nil {
+		return
+	}
+
 	var event Event
-	err := context.ShouldBindJSON(&event)
+	err = context.ShouldBindJSON(&event)
 	if err != nil {
 		slog.Info("createEvent: bind json failed", "error", err)
 		context.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
-	result, err := handler.svc.createEvent(event)
+	result, err := handler.svc.createEvent(event, userId)
 	if err != nil {
 		slog.Info("createEvent: create event failed", "error", err)
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create event."})
@@ -76,6 +81,11 @@ func (handler Handler) createEvent(context *gin.Context) {
 }
 
 func (handler Handler) getEvent(context *gin.Context) {
+	userId, err := handler.verifyToken(context)
+	if err != nil {
+		return
+	}
+
 	eventId, err := strconv.ParseInt(context.Param("id"), 10, 64)
 	if err != nil {
 		slog.Info("getEvent: get eventId failed", "error", err)
@@ -83,7 +93,7 @@ func (handler Handler) getEvent(context *gin.Context) {
 		return
 	}
 
-	event, err := handler.svc.getEvent(eventId)
+	event, err := handler.svc.getEvent(eventId, userId)
 	if err != nil {
 		slog.Info("getEvent: get event failed", "error", err)
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to retrieve event."})
@@ -94,6 +104,11 @@ func (handler Handler) getEvent(context *gin.Context) {
 }
 
 func (handler Handler) updateEvent(context *gin.Context) {
+	userId, err := handler.verifyToken(context)
+	if err != nil {
+		return
+	}
+
 	eventId, err := strconv.ParseInt(context.Param("id"), 10, 64)
 	if err != nil {
 		slog.Info("updateEvent: get eventId failed", "error", err)
@@ -111,7 +126,7 @@ func (handler Handler) updateEvent(context *gin.Context) {
 
 	event.ID = eventId
 
-	result, err := handler.svc.updateEvent(event)
+	result, err := handler.svc.updateEvent(event, userId)
 	if err != nil {
 		slog.Info("updateEvent: update event failed", "error", err)
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update event."})
@@ -122,6 +137,11 @@ func (handler Handler) updateEvent(context *gin.Context) {
 }
 
 func (handler Handler) deleteEvent(context *gin.Context) {
+	userId, err := handler.verifyToken(context)
+	if err != nil {
+		return
+	}
+
 	eventId, err := strconv.ParseInt(context.Param("id"), 10, 64)
 	if err != nil {
 		slog.Info("deleteEvent: get eventId failed", "error", err)
@@ -129,7 +149,7 @@ func (handler Handler) deleteEvent(context *gin.Context) {
 		return
 	}
 
-	err = handler.svc.deleteEvent(eventId)
+	err = handler.svc.deleteEvent(eventId, userId)
 	if err != nil {
 		slog.Info("deleteEvent: delete event failed", "error", err)
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to delete event."})

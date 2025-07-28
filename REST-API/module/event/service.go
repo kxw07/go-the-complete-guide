@@ -1,7 +1,5 @@
 package event
 
-import "math/rand"
-
 type Service struct {
 	repo *Repository
 }
@@ -10,24 +8,22 @@ func NewService(repo *Repository) *Service {
 	return &Service{repo: repo}
 }
 
-func (svc Service) getEvents() ([]Event, error) {
-	return svc.repo.getAllEvents()
+func (svc Service) getEvents(userId int64) ([]Event, error) {
+	return svc.repo.getAllEvents(userId)
 }
 
-func (svc Service) getEvent(id int64) (Event, error) {
-	return svc.repo.getEvent(id)
+func (svc Service) getEvent(eventId int64, userId int64) (Event, error) {
+	return svc.repo.getEvent(eventId)
 }
 
-func (svc Service) createEvent(event Event) (Event, error) {
-	event.UserID = rand.Int63()
-
-	return svc.repo.createEvent(event)
+func (svc Service) createEvent(event Event, userId int64) (Event, error) {
+	return svc.repo.createEvent(event, userId)
 }
 
-func (svc Service) updateEvent(event Event) (Event, error) {
-	return svc.repo.updateEvent(event)
+func (svc Service) updateEvent(event Event, userId int64) (Event, error) {
+	return svc.repo.updateEvent(event, userId)
 }
 
-func (svc Service) deleteEvent(id int64) error {
-	return svc.repo.deleteEvent(id)
+func (svc Service) deleteEvent(eventId int64, userId int64) error {
+	return svc.repo.deleteEvent(eventId, userId)
 }

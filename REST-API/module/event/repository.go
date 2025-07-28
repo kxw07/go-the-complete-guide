@@ -13,13 +13,14 @@ func NewRepository(sto *storage.Storage) *Repository {
 	return &Repository{sto: sto}
 }
 
-func (rep Repository) getAllEvents() ([]Event, error) {
+func (rep Repository) getAllEvents(userId int64) ([]Event, error) {
 	getEventsSql := `
-	SELECT id, user_id, name, description, location, date_time
+	SELECT id, name, description, location, date_time
 	FROM events
+	WHERE user_id = ?
 	`
 
-	rows, err := rep.sto.GetDB().Query(getEventsSql)
+	rows, err := rep.sto.GetDB().Query(getEventsSql, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +30,7 @@ func (rep Repository) getAllEvents() ([]Event, error) {
 	var events []Event
 	for rows.Next() {
 		var event Event
-		err := rows.Scan(&event.ID, &event.UserID, &event.Name, &event.Description, &event.Location, &event.DateTime)
+		err := rows.Scan(&event.ID, &event.Name, &event.Description, &event.Location, &event.DateTime)
 		if err != nil {
 			return nil, err
 		}
@@ -39,14 +40,14 @@ func (rep Repository) getAllEvents() ([]Event, error) {
 	return events, nil
 }
 
-func (rep Repository) getEvent(eventId int64) (Event, error) {
+func (rep Repository) getEvent(eventId int64, userId int64) (Event, error) {
 	getEventByIdSql := `
 	SELECT id, user_id, name, description, location, date_time
 	FROM events
-	WHERE id = ?
+	WHERE id = ? AND user_id = ?
 	`
 
-	row := rep.sto.GetDB().QueryRow(getEventByIdSql, eventId)
+	row := rep.sto.GetDB().QueryRow(getEventByIdSql, eventId, userId)
 	if row.Err() != nil {
 		return Event{}, row.Err()
 	}
@@ -59,7 +60,7 @@ func (rep Repository) getEvent(eventId int64) (Event, error) {
 	return event, nil
 }
 
-func (rep Repository) createEvent(event Event) (Event, error) {
+func (rep Repository) createEvent(event Event, userId int64) (Event, error) {
 	insertEventSql := `
 	INSERT INTO events (user_id, name, description, location, date_time)
 	VALUES (?, ?, ?, ?, ?)
@@ -68,7 +69,7 @@ func (rep Repository) createEvent(event Event) (Event, error) {
 
 	var result Event
 	err := rep.sto.GetDB().
-		QueryRow(insertEventSql, event.UserID, event.Name, event.Description, event.Location, event.DateTime).
+		QueryRow(insertEventSql, userId, event.Name, event.Description, event.Location, event.DateTime).
 		Scan(&result.ID, &result.UserID, &result.Name, &result.Description, &result.Location, &result.DateTime)
 
 	if err != nil {
@@ -79,17 +80,17 @@ func (rep Repository) createEvent(event Event) (Event, error) {
 	return result, nil
 }
 
-func (rep Repository) updateEvent(event Event) (Event, error) {
+func (rep Repository) updateEvent(event Event, userId int64) (Event, error) {
 	updateEventSql := `
 	UPDATE events
 	SET name = ?, description = ?, location = ?, date_time = ?
-	WHERE id = ?
+	WHERE id = ? AND user_id = ?
 	RETURNING name, description, location, date_time
 	`
 
 	var result Event
 	err := rep.sto.GetDB().
-		QueryRow(updateEventSql, event.Name, event.Description, event.Location, event.DateTime, event.ID).
+		QueryRow(updateEventSql, event.Name, event.Description, event.Location, event.DateTime, event.ID, userId).
 		Scan(&result.Name, &result.Description, &result.Location, &result.DateTime)
 
 	if err != nil {
@@ -100,11 +101,11 @@ func (rep Repository) updateEvent(event Event) (Event, error) {
 	return result, nil
 }
 
-func (rep Repository) deleteEvent(id int64) error {
+func (rep Repository) deleteEvent(eventId int64, userId int64) error {
 	deleteEventSql := `
-	DELETE FROM events WHERE id = ?
+	DELETE FROM events WHERE id = ? AND user_id = ?
 	`
-	_, err := rep.sto.GetDB().Exec(deleteEventSql, id)
+	_, err := rep.sto.GetDB().Exec(deleteEventSql, eventId, userId)
 
 	if err != nil {
 		slog.Error("error when deleting event", "error", err)
