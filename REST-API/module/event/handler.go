@@ -1,6 +1,7 @@
 package event
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/kxw07/REST-API/utils"
 	"log/slog"
@@ -24,17 +25,25 @@ func (handler Handler) RegisterRoutes(server *gin.Engine) {
 	server.DELETE("/event/:id", handler.deleteEvent)
 }
 
-func (handler Handler) getEvents(context *gin.Context) {
+func (handler Handler) verifyToken(context *gin.Context) error {
 	token := context.GetHeader("Authorization")
 	if token == "" {
 		context.JSON(http.StatusUnauthorized, gin.H{"message": "No Authorization"})
-		return
+		return errors.New("no authorization")
 	}
 
-	err := utils.ValidToken(token)
+	err := utils.VerifyToken(token)
 	if err != nil {
 		slog.Info("getEvents: valid token failed", "error", err)
 		context.JSON(http.StatusUnauthorized, gin.H{"message": "No Authorization"})
+		return errors.New("no authorization")
+	}
+	return nil
+}
+
+func (handler Handler) getEvents(context *gin.Context) {
+	err := handler.verifyToken(context)
+	if err != nil {
 		return
 	}
 
