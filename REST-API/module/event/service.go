@@ -13,7 +13,7 @@ func (svc Service) getEvents(userId int64) ([]Event, error) {
 }
 
 func (svc Service) getEvent(eventId int64, userId int64) (Event, error) {
-	return svc.repo.getEvent(eventId)
+	return svc.repo.getEvent(eventId, userId)
 }
 
 func (svc Service) createEvent(event Event, userId int64) (Event, error) {
