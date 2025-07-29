@@ -1,9 +1,8 @@
 package event
 
 import (
-	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/kxw07/REST-API/utils"
+	"github.com/kxw07/REST-API/module/middlewares"
 	"log/slog"
 	"net/http"
 	"strconv"
@@ -18,34 +17,17 @@ func NewHandler(svc *Service) *Handler {
 }
 
 func (handler Handler) RegisterRoutes(server *gin.Engine) {
-	server.GET("/event/all", handler.getEvents)
-	server.GET("/event/:id", handler.getEvent)
-	server.POST("/event", handler.createEvent)
-	server.PUT("/event/:id", handler.updateEvent)
-	server.DELETE("/event/:id", handler.deleteEvent)
-}
-
-func (handler Handler) verifyToken(context *gin.Context) (int64, error) {
-	token := context.GetHeader("Authorization")
-	if token == "" {
-		context.JSON(http.StatusUnauthorized, gin.H{"message": "No Authorization"})
-		return 0, errors.New("no authorization")
-	}
-
-	userId, err := utils.VerifyToken(token)
-	if err != nil {
-		slog.Info("getEvents: valid token failed", "error", err)
-		context.JSON(http.StatusUnauthorized, gin.H{"message": "No Authorization"})
-		return 0, errors.New("no authorization")
-	}
-	return userId, nil
+	authenticated := server.Group("/event")
+	authenticated.Use(middlewares.Authenticate)
+	authenticated.GET("/all", handler.getEvents)
+	authenticated.GET("/:id", handler.getEvent)
+	authenticated.POST("/", handler.createEvent)
+	authenticated.PUT("/:id", handler.updateEvent)
+	authenticated.DELETE("/:id", handler.deleteEvent)
 }
 
 func (handler Handler) getEvents(context *gin.Context) {
-	userId, err := handler.verifyToken(context)
-	if err != nil {
-		return
-	}
+	userId := context.GetInt64("userId")
 
 	events, err := handler.svc.getEvents(userId)
 	if err != nil {
@@ -57,13 +39,10 @@ func (handler Handler) getEvents(context *gin.Context) {
 }
 
 func (handler Handler) createEvent(context *gin.Context) {
-	userId, err := handler.verifyToken(context)
-	if err != nil {
-		return
-	}
+	userId := context.GetInt64("userId")
 
 	var event Event
-	err = context.ShouldBindJSON(&event)
+	err := context.ShouldBindJSON(&event)
 	if err != nil {
 		slog.Info("createEvent: bind json failed", "error", err)
 		context.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
@@ -81,10 +60,7 @@ func (handler Handler) createEvent(context *gin.Context) {
 }
 
 func (handler Handler) getEvent(context *gin.Context) {
-	userId, err := handler.verifyToken(context)
-	if err != nil {
-		return
-	}
+	userId := context.GetInt64("userId")
 
 	eventId, err := strconv.ParseInt(context.Param("id"), 10, 64)
 	if err != nil {
@@ -104,10 +80,7 @@ func (handler Handler) getEvent(context *gin.Context) {
 }
 
 func (handler Handler) updateEvent(context *gin.Context) {
-	userId, err := handler.verifyToken(context)
-	if err != nil {
-		return
-	}
+	userId := context.GetInt64("userId")
 
 	eventId, err := strconv.ParseInt(context.Param("id"), 10, 64)
 	if err != nil {
@@ -137,10 +110,7 @@ func (handler Handler) updateEvent(context *gin.Context) {
 }
 
 func (handler Handler) deleteEvent(context *gin.Context) {
-	userId, err := handler.verifyToken(context)
-	if err != nil {
-		return
-	}
+	userId := context.GetInt64("userId")
 
 	eventId, err := strconv.ParseInt(context.Param("id"), 10, 64)
 	if err != nil {
