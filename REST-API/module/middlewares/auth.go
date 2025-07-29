@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/kxw07/REST-API/utils"
+	"github.com/kxw07/REST-API/utils/jwt"
 	"log/slog"
 	"net/http"
 )
@@ -14,7 +14,7 @@ func Authenticate(context *gin.Context) {
 		return
 	}
 
-	userId, err := utils.VerifyToken(token)
+	userId, err := jwt.VerifyToken(token)
 	if err != nil {
 		slog.Info("getEvents: valid token failed", "error", err)
 		context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "No Authorization"})

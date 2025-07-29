@@ -3,7 +3,8 @@ package user
 import (
 	"errors"
 	"fmt"
-	"github.com/kxw07/REST-API/utils"
+	"github.com/kxw07/REST-API/utils/hash"
+	"github.com/kxw07/REST-API/utils/jwt"
 )
 
 type Service struct {
@@ -15,7 +16,7 @@ func NewService(repo *Repository) *Service {
 }
 
 func (svc Service) signup(user User) (User, error) {
-	hashValue, err := utils.HashPassword(user.Password)
+	hashValue, err := hash.Do(user.Password)
 	if err != nil {
 		return User{}, errors.New(fmt.Sprintf("failed to hash password: %v", err))
 	}
@@ -27,12 +28,12 @@ func (svc Service) signup(user User) (User, error) {
 
 func (svc Service) login(user User) (string, error) {
 	storedUser, _ := svc.repo.get(user)
-	verifiedResult := utils.VerifyPassword(storedUser.Password, user.Password)
+	verifiedResult := hash.Compare(storedUser.Password, user.Password)
 	if !verifiedResult {
 		return "", errors.New("verified failed")
 	}
 
-	token, err := utils.GenerateToken(storedUser.Email, storedUser.ID)
+	token, err := jwt.GenerateToken(storedUser.Email, storedUser.ID)
 	if err != nil {
 		return "", errors.New(fmt.Sprintf("failed to generate token: %v", err))
 	}
