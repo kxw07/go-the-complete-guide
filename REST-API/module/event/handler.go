@@ -24,6 +24,8 @@ func (handler Handler) RegisterRoutes(server *gin.Engine) {
 	authenticated.POST("/", handler.createEvent)
 	authenticated.PUT("/:id", handler.updateEvent)
 	authenticated.DELETE("/:id", handler.deleteEvent)
+	authenticated.POST("/:id/registry", handler.registerEvent)
+	authenticated.DELETE("/:id/registry", handler.unregisterEvent)
 }
 
 func (handler Handler) getEvents(context *gin.Context) {
@@ -127,4 +129,44 @@ func (handler Handler) deleteEvent(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusOK, gin.H{"message": "Event deleted."})
+}
+
+func (handler Handler) registerEvent(context *gin.Context) {
+	userId := context.GetInt64("userId")
+
+	eventId, err := strconv.ParseInt(context.Param("id"), 10, 64)
+	if err != nil {
+		slog.Info("deleteEvent: get eventId failed", "error", err)
+		context.JSON(http.StatusBadRequest, gin.H{"message": "Invalid event ID."})
+		return
+	}
+
+	err = handler.svc.registerEvent(eventId, userId)
+	if err != nil {
+		slog.Info("registerEvent: register event failed", "error", err)
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to register for event."})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"message": "Registered for event."})
+}
+
+func (handler Handler) unregisterEvent(context *gin.Context) {
+	userId := context.GetInt64("userId")
+
+	eventId, err := strconv.ParseInt(context.Param("id"), 10, 64)
+	if err != nil {
+		slog.Info("deleteEvent: get eventId failed", "error", err)
+		context.JSON(http.StatusBadRequest, gin.H{"message": "Invalid event ID."})
+		return
+	}
+
+	err = handler.svc.unregisterEvent(eventId, userId)
+	if err != nil {
+		slog.Info("unregisterEvent: unregister event failed", "error", err)
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to unregister from event."})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"message": "Unregistered from event."})
 }

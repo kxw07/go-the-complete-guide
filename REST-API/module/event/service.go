@@ -27,3 +27,11 @@ func (svc Service) updateEvent(event Event, userId int64) (Event, error) {
 func (svc Service) deleteEvent(eventId int64, userId int64) error {
 	return svc.repo.deleteEvent(eventId, userId)
 }
+
+func (svc Service) registerEvent(eventId int64, userId int64) error {
+	return svc.repo.registerEvent(eventId, userId)
+}
+
+func (svc Service) unregisterEvent(eventId int64, userId int64) error {
+	return svc.repo.unregisterEvent(eventId, userId)
+}

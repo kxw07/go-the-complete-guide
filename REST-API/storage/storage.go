@@ -73,4 +73,19 @@ func (sto *Storage) createTable() {
 		slog.Error("Could not create table: events")
 		panic(err)
 	}
+
+	createRegistrationsTable := `
+	CREATE TABLE IF NOT EXISTS registrations (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		event_id INTEGER NOT NULL,
+		user_id INTEGER NOT NULL,
+		registration_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+		FOREIGN KEY (event_id) REFERENCES events(id),
+		FOREIGN KEY (user_id) REFERENCES users(id)
+	)`
+	_, err = sto.db.Exec(createRegistrationsTable)
+	if err != nil {
+		slog.Error("Could not create table: registrations")
+		panic(err)
+	}
 }

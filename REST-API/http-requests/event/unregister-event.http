@@ -1,0 +1,3 @@
+DELETE http://127.0.0.1:8080/event/2/registry
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXI3ODlAZ21haWwuY29tIiwiZXhwaXJlIjoxNzUzNjk4OTY1LCJ1c2VySWQiOjN9.x6zCJbzzislIjEqmIR0h9j78YS4rdzx9o5W5MvAt16o

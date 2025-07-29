@@ -114,3 +114,32 @@ func (rep Repository) deleteEvent(eventId int64, userId int64) error {
 
 	return nil
 }
+
+func (rep Repository) registerEvent(eventId int64, userId int64) error {
+	insertRegistrationSql := `
+	INSERT INTO registrations (event_id, user_id)
+	VALUES (?, ?)
+	`
+
+	_, err := rep.sto.GetDB().Exec(insertRegistrationSql, eventId, userId)
+	if err != nil {
+		slog.Error("error when insert registrations", "error", err)
+		return err
+	}
+
+	return nil
+}
+
+func (rep Repository) unregisterEvent(eventId int64, userId int64) error {
+	deleteRegistrationSql := `
+	DELETE FROM registrations WHERE event_id = ? AND user_id = ?
+	`
+
+	_, err := rep.sto.GetDB().Exec(deleteRegistrationSql, eventId, userId)
+	if err != nil {
+		slog.Error("error when delete registrations", "error", err)
+		return err
+	}
+
+	return nil
+}
