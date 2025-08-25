@@ -1,11 +1,9 @@
 package main
 
 import (
-	"fmt"
-
-	"github.com/samborkent/uuidv7"
+	"log/slog"
 )
 
 func main() {
-	fmt.Println(uuidv7.New().String())
+	slog.Info("try try")
 }
