@@ -1,8 +1,10 @@
 package event
 
 import (
-	"github.com/kxw07/REST-API/storage"
+	"database/sql"
 	"log/slog"
+
+	"github.com/kxw07/REST-API/storage"
 )
 
 type Repository struct {
@@ -134,8 +136,29 @@ func (rep Repository) unregisterEvent(eventId int64, userId int64) error {
 	deleteRegistrationSql := `
 	DELETE FROM registrations WHERE event_id = ? AND user_id = ?
 	`
-
 	_, err := rep.sto.GetDB().Exec(deleteRegistrationSql, eventId, userId)
+	if err != nil {
+		slog.Error("error when delete registrations", "error", err)
+		return err
+	}
+
+	return nil
+}
+
+func (rep Repository) runUnregisterEventWithInterfaceExcer(eventId int64, userId int64) error {
+	return unregisterEvent(rep.sto.GetDB(), eventId, userId)
+}
+
+type Execer interface {
+	Exec(query string, args ...any) (sql.Result, error)
+}
+
+func unregisterEvent(db Execer, eventId int64, userId int64) error {
+	deleteRegistrationSql := `
+	DELETE FROM registrations WHERE event_id = ? AND user_id = ?
+	`
+
+	_, err := db.Exec(deleteRegistrationSql, eventId, userId)
 	if err != nil {
 		slog.Error("error when delete registrations", "error", err)
 		return err

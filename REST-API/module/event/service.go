@@ -33,5 +33,6 @@ func (svc Service) registerEvent(eventId int64, userId int64) error {
 }
 
 func (svc Service) unregisterEvent(eventId int64, userId int64) error {
-	return svc.repo.unregisterEvent(eventId, userId)
+	// return svc.repo.unregisterEvent(eventId, userId)
+	return svc.repo.runUnregisterEventWithInterfaceExcer(eventId, userId)
 }
